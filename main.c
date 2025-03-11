@@ -4,86 +4,114 @@
 #define MAXSZ	256
 #define TABSZ	8
 
-int tab_and_space(char *s, int *i, int *pos);
+int detab(char *s);
 
 int main(void)
 {
-	int c, i, pos;
+	int c, i;
 	i = 0;
 	char s[MAXSZ];
-	while((c = getchar()) != EOF)
+	while((c = getchar()) != EOF && i < MAXSZ - 2)
 		s[i++] = c;
 	s[i] = '\0';
 
-	int n;
+	int n, prev_ch;
+	prev_ch = 0;
 	for(n = 0; n < i; ++n, ++pos)
 	{
-		if(s[n] == ' ' || s[n] == '\t')
+		if((s[n] == ' ' || s[n] == '\t') && prev_ch == ' ' || s[n])
 			tab_and_space(s, &n, &pos);
+		prev_ch = s[n];
 	}
 	printf("\n%s", s);
 	printf("\nBefore: %8d", i);
 	printf("\nBefore: %8d\n", n);
 }
 
-/* TODO: call this function something better 
- * This takes in a string with first position of '\t' or ' ' and rearranges it 
+/* detab: This takes in a string with first position of '\t' or ' ' and rearranges it 
  * and adds it to the given string, then moves pointer ahead to first non blank 
- * space character */
-int tab_and_space(char *s, int *i, int *pos)
+ * space character. Returns removed spaces  */
+int detab(char *s, size_t MAXLEN, size_t TABSZ)
 {
-	if(s[*i] != ' ' && s[*i] != '\t')
-		return -1; /* we got something that tabs or spaces */
+	if(strlen(s) == 0)
+	{
+		printf("Input string is empty\n");
+		return -1;
+	}
 	
-	/* TODO: do something if \0 is encountered */
-
-	int end, tabmod, n, spacecnt; //TODO: REMOVE tabmod, IT'S NOT NEEDED ANYMORE
-
-	/* find end of blank space */
-	end = *i;
-	while(s[end] != '\0' && (s[end] == ' ' || s[end] == '\t'))
-		++end;
-
-	/* find out how much it would have advanced it */
-	tabmod = TABSZ - *i % TABSZ; //TODO: REMOVE THIS LINE AFTER DEBUGGING, IT'S NOT NEEDED ANYMORE
-	spacecnt = 0;
-	for(n = *i; n < end; n++)
+	int stsz, edsz;
+        stsz = (int) strlen(s); // get starting size of string	
+	char tmp[stsz+1];
+	strcpy(tmp, s);
+	
+	/* now work with our tmp string */
+	int i, j, pos, pos_prev;
+	i = j = pos = pos_prev = 0;
+	while(s[i] != '\0')
 	{
-		if(s[n] == '\t')
+		/* we need to update pos something possibly other than 1 because tab advances not one character but to next tab stop */
+		if(s[i] == '\t' && s[i-1] != ' ')
 		{
-			spacecnt = TABSZ - (n + spacecnt) % TABSZ;
+			pos_prev = pos;
+			pos += TABSZ - pos % TABSZ;
 		}
-		else if(s[n] == ' ')
-		{
-			++spacecnt;
-		}
-		else
-			printf("error: non whitespace character encountered when not supposed to be.");
-	}
 
-	/* now find minimum spaces and tabs we need to do and fix string provided to us */
-	n = 0;
-	while(spacecnt > 0)
-	{
-		/* add in all the tabs until the tabs bring us too far */
-		if(spacecnt / TABSZ)
+		if((s[i] == '\t' || s[i] == ' ') && s[i-1] == ' ')
 		{
-			s[*i] = 'T';
-			int tabmov = TABSZ - *i % TABSZ;
-			spacecnt -= tabmov;
-			++*i;
-			*pos += tabmov;
+			/* look ahead?? */
+			/* next tab defined as "TABSZ - pos % TABSZ" */
+			/* look ahead code */
+			/* rewind back one character to start at beginning */
+			--i;
+			--j;
+			if(s[i] == '\t')
+			{
+				pos = pos_prev;
+			}
+			int i_tmp = i;
 			
-		}
-		/* add all the spaces until we run out */
-		else
-		{
-			//s[*i++] = ' ';
-			s[*i++] = 'S';
-			++*pos;
-		}
-	}
+			/* see what ending position would be from all the spaces and tabs */
+			while(s[i_tmp] == ' ' || s[i_tmp] == '\t')
+			{
+				if(s[i] == '\t')
+					pos += TABSZ - pos % TABSZ;
+				else if(s[i_tmp] == ' ')
+					++pos;
+				else
+					printf("error\n");
+				++i_tmp;
+			}
 
-	/* now move the remaining string forward */
-	strcpy(&s[*i], &s[end+1]);
+			/* difference pos and pos_prev is spaces (if that is relevant) */
+			int total_spaces, tab_sp_inc;
+		        total_spaces = pos - prev_pos;
+
+			/* now replace with as many tabs as possible */
+			while((tab_sp_inc = TABSZ - pos % TABSZ) < spaces)
+			{
+				tmp[j++] = '\t';
+				prev_pos += tab_sp_inc;
+				spaces -= tab_sp_inc;
+			}
+
+			/* now add appropriate amount of spaces */
+			while(spaces > 0)
+			{
+				tmp[j++] = ' ';
+				spaces--;
+			}
+
+		}
+		++i;
+
+	}
+	tmp[j] = '\0';
+	int saved_space = i - j; /* we will return this as the spaces saved */
+	j = 0;
+	do
+	{
+		s[j] = tmp[j];
+	} while(tmp[j++] != '\0');
+
+	return saved_spaces;
 }
