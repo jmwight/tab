@@ -2,12 +2,13 @@
 #include <string.h>
 
 #define MAXSZ	256
-#define TABSZ	8
+#define TABSIZE	8
 
-int detab(char *s);
+int detab(char *s, size_t maxlen, size_t tabsz);
 
 int main(void)
 {
+	/* get string from user */
 	int c, i;
 	i = 0;
 	char s[MAXSZ];
@@ -15,23 +16,20 @@ int main(void)
 		s[i++] = c;
 	s[i] = '\0';
 
-	int n, prev_ch;
-	prev_ch = 0;
-	for(n = 0; n < i; ++n, ++pos)
-	{
-		if((s[n] == ' ' || s[n] == '\t') && prev_ch == ' ' || s[n])
-			tab_and_space(s, &n, &pos);
-		prev_ch = s[n];
-	}
+	/* run detab function */
+	int len, ch_saved;
+	len = strlen(s);
+	ch_saved = detab(s, MAXSZ, TABSIZE);
+	
 	printf("\n%s", s);
-	printf("\nBefore: %8d", i);
-	printf("\nBefore: %8d\n", n);
+	printf("\nPrev Length: %8d", len);
+	printf("\nCharacters Saved: %8d\n", ch_saved);
 }
 
 /* detab: This takes in a string with first position of '\t' or ' ' and rearranges it 
  * and adds it to the given string, then moves pointer ahead to first non blank 
- * space character. Returns removed spaces  */
-int detab(char *s, size_t MAXLEN, size_t TABSZ)
+ * space character. Returns removed spaces  */ //TODO: INTEGRATE MAXLEN IN 
+int detab(char *s, size_t maxlen, size_t tabsz)
 {
 	if(strlen(s) == 0)
 	{
@@ -53,54 +51,58 @@ int detab(char *s, size_t MAXLEN, size_t TABSZ)
 		if(s[i] == '\t' && s[i-1] != ' ')
 		{
 			pos_prev = pos;
-			pos += TABSZ - pos % TABSZ;
+			pos += tabsz - pos % tabsz;
 		}
 
 		if((s[i] == '\t' || s[i] == ' ') && s[i-1] == ' ')
 		{
 			/* look ahead?? */
-			/* next tab defined as "TABSZ - pos % TABSZ" */
+			/* next tab defined as "tabsz - pos % tabsz" */
 			/* look ahead code */
 			/* rewind back one character to start at beginning */
 			--i;
-			--j;
+			/* j--; REMOVED */
 			if(s[i] == '\t')
 			{
 				pos = pos_prev;
 			}
-			int i_tmp = i;
+			//int i_tmp = i; I don't think this is needed and could possibly be deleted 
 			
 			/* see what ending position would be from all the spaces and tabs */
-			while(s[i_tmp] == ' ' || s[i_tmp] == '\t')
+			while(s[i] == ' ' || s[i] == '\t') /* changing all i_tmp to i */
 			{
 				if(s[i] == '\t')
-					pos += TABSZ - pos % TABSZ;
-				else if(s[i_tmp] == ' ')
+					pos += tabsz - pos % tabsz;
+				else if(s[i] == ' ')
 					++pos;
 				else
 					printf("error\n");
-				++i_tmp;
+				++i;
 			}
 
 			/* difference pos and pos_prev is spaces (if that is relevant) */
 			int total_spaces, tab_sp_inc;
-		        total_spaces = pos - prev_pos;
+		        total_spaces = pos - pos_prev;
 
 			/* now replace with as many tabs as possible */
-			while((tab_sp_inc = TABSZ - pos % TABSZ) < spaces)
+			while((tab_sp_inc = tabsz - pos % tabsz) < total_spaces)
 			{
 				tmp[j++] = '\t';
-				prev_pos += tab_sp_inc;
-				spaces -= tab_sp_inc;
+				pos_prev += tab_sp_inc;
+				total_spaces -= tab_sp_inc;
 			}
 
 			/* now add appropriate amount of spaces */
-			while(spaces > 0)
+			while(total_spaces > 0)
 			{
 				tmp[j++] = ' ';
-				spaces--;
+				total_spaces--;
 			}
 
+		}
+		else
+		{
+			tmp[j++] = s[i];
 		}
 		++i;
 
@@ -113,5 +115,5 @@ int detab(char *s, size_t MAXLEN, size_t TABSZ)
 		s[j] = tmp[j];
 	} while(tmp[j++] != '\0');
 
-	return saved_spaces;
+	return saved_space;
 }
