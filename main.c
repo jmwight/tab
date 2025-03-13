@@ -37,10 +37,8 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 		return -1;
 	}
 	
-	int stsz, edsz;
-        stsz = (int) strlen(s); // get starting size of string	
-	char tmp[stsz+1];
-	strcpy(tmp, s);
+	char tmp[strlen(s)+1];
+	//strcpy(tmp, s);
 	
 	/* now work with our tmp string */
 	int i, j, pos, pos_prev;
@@ -61,10 +59,15 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 			/* look ahead code */
 			/* rewind back one character to start at beginning */
 			--i;
-			/* j--; REMOVED */
+			j--; /* REMOVED */
 			if(s[i] == '\t')
 			{
 				pos = pos_prev;
+			}
+			else
+			{
+				--pos;
+				pos_prev = pos;
 			}
 			//int i_tmp = i; I don't think this is needed and could possibly be deleted 
 			
@@ -79,13 +82,14 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 					printf("error\n");
 				++i;
 			}
+			--i;
 
 			/* difference pos and pos_prev is spaces (if that is relevant) */
 			int total_spaces, tab_sp_inc;
 		        total_spaces = pos - pos_prev;
 
 			/* now replace with as many tabs as possible */
-			while((tab_sp_inc = tabsz - pos % tabsz) < total_spaces)
+			while((tab_sp_inc = tabsz - pos % tabsz) <= total_spaces)
 			{
 				tmp[j++] = '\t';
 				pos_prev += tab_sp_inc;
@@ -103,17 +107,13 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 		else
 		{
 			tmp[j++] = s[i];
+			++pos;
 		}
 		++i;
 
 	}
 	tmp[j] = '\0';
-	int saved_space = i - j; /* we will return this as the spaces saved */
-	j = 0;
-	do
-	{
-		s[j] = tmp[j];
-	} while(tmp[j++] != '\0');
+	strcpy(s, tmp);
 
-	return saved_space;
+	return i-j;
 }
