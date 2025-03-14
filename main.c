@@ -29,7 +29,7 @@ int main(void)
 /* detab: This takes in a string with first position of '\t' or ' ' and rearranges it 
  * and adds it to the given string, then moves pointer ahead to first non blank 
  * space character. Returns removed spaces  */ //TODO: INTEGRATE MAXLEN IN 
-int detab(char *s, size_t maxlen, size_t tabsz)
+int entab(char *s, size_t maxlen, size_t tabsz)
 {
 	if(strlen(s) == 0)
 	{
