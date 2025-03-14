@@ -38,7 +38,6 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 	}
 	
 	char tmp[strlen(s)+1];
-	//strcpy(tmp, s);
 	
 	/* now work with our tmp string */
 	int i, j, pos, pos_prev;
@@ -46,20 +45,17 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 	while(s[i] != '\0')
 	{
 		/* we need to update pos something possibly other than 1 because tab advances not one character but to next tab stop */
-		if(s[i] == '\t' && s[i-1] != ' ')
+		/*if(s[i] == '\t' && s[i-1] != ' ')
 		{
 			pos_prev = pos;
 			pos += tabsz - pos % tabsz;
-		}
+			tmp[j++] = s[i++];
+		}*/
 
-		if((s[i] == '\t' || s[i] == ' ') && s[i-1] == ' ')
+		if((s[i] == '\t' || s[i] == ' ') && (s[i-1] == ' ' || s[i-1] == '\t'))
 		{
-			/* look ahead?? */
-			/* next tab defined as "tabsz - pos % tabsz" */
-			/* look ahead code */
-			/* rewind back one character to start at beginning */
 			--i;
-			j--; /* REMOVED */
+			j--;
 			if(s[i] == '\t')
 			{
 				pos = pos_prev;
@@ -69,10 +65,9 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 				--pos;
 				pos_prev = pos;
 			}
-			//int i_tmp = i; I don't think this is needed and could possibly be deleted 
 			
 			/* see what ending position would be from all the spaces and tabs */
-			while(s[i] == ' ' || s[i] == '\t') /* changing all i_tmp to i */
+			while(s[i] == ' ' || s[i] == '\t') 
 			{
 				if(s[i] == '\t')
 					pos += tabsz - pos % tabsz;
@@ -89,7 +84,7 @@ int detab(char *s, size_t maxlen, size_t tabsz)
 		        total_spaces = pos - pos_prev;
 
 			/* now replace with as many tabs as possible */
-			while((tab_sp_inc = tabsz - pos % tabsz) <= total_spaces)
+			while((tab_sp_inc = tabsz - pos_prev % tabsz) <= total_spaces)
 			{
 				tmp[j++] = '\t';
 				pos_prev += tab_sp_inc;
