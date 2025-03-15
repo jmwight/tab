@@ -90,8 +90,18 @@ int main(int argc, char **argv)
 	char s[MAXSZ];	
 	if(fi)
 	{
+		char *pos = s;
 		/* TODO: read input from given file */
-		;
+		char buf[MAXSZ];
+		FILE *f = fopen(f_i_path, "r");
+		int c;
+		while((c = fgetc(f)) != EOF && c != '\0')
+		{
+			*pos++ = c;
+			putchar(c);
+		}
+		//printf("%s\n", s);
+		fclose(f);
 	}
 	else
 	{
@@ -125,6 +135,8 @@ int main(int argc, char **argv)
 	if(fo)
 	{
 		/* TODO: write to output file */
-		;
+		FILE *f = fopen(f_o_path, "w");
+		fputs(s, f);
+		fclose(f);
 	}
 }
