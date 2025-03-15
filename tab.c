@@ -1,11 +1,15 @@
 #include <string.h>
 #include <stdio.h>
+#include "tab.h"
 
 void copy(char *src, char *dest);
 
-int detab(char *s, size_t tbw, size_t maxlinelen)
+/* detab: removes all tabs and replaces with the appropriate number of spaces. 
+ * Returns the number of extra characters */
+/* TODO: IMPLEMENT MAXLEN */
+int detab(char *s, size_t maxlen, size_t tbw)
 {
-    char s_cpy[maxlinelen];
+    char s_cpy[maxlen];
     copy(s, s_cpy);
 
     int n, p, offst;
@@ -30,7 +34,8 @@ int detab(char *s, size_t tbw, size_t maxlinelen)
         ++n;
     }
     s[n+offst] = '\0';
-    return n+offst;
+    //return n+offst;
+    return offst; /* I think this will tell us the extra characters added */
 }
 
 /* entab: This takes in a string with first position of '\t' or ' ' and rearranges it
@@ -120,7 +125,8 @@ int entab(char *s, size_t maxlen, size_t tabsz)
 	return i-j;
 }
 
-/* copies source string into destination string */
+/* copies source string into destination string. Just felt like writing my own for fun instead
+ * of using function in standard string.h library */
 void copy(char *src, char *dest)
 {
     int i = 0;
