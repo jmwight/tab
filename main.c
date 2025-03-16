@@ -42,12 +42,12 @@ int main(int argc, char **argv)
 				fi = true;
 				f_i_path = *++argv; /* set pointer to next argument */
 				--argc;
-				following = true; // need to add --argc
+				following = true;
 				break;
 			case 'o':
 				fo = true;
 				f_o_path = *++argv;
-				following = true; // need to add --argc
+				following = true;
 				--argc;
 				break;
 			case 't':
