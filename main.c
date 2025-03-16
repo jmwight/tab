@@ -3,7 +3,7 @@
 #include "tab.h"
 #include <stdlib.h>
 
-#define MAXSZ	256
+#define MAXSZ	10240
 #define TABSIZE	8
 
 #define true	1
@@ -23,7 +23,6 @@ int main(int argc, char **argv)
 	tbw = -1;
 
 	/* Options: -d for detab, -e for entab, -i for reading from file, -o for writeint to a file */
-	int n; /* TODO: REMOVE THIS VARIABLE IN NEXT COMPILE */
 	while(--argc > 0)
 	{
 		char c;
@@ -41,7 +40,6 @@ int main(int argc, char **argv)
 				break;
 			case 'i':
 				fi = true;
-				/* TODO: RETURN ERROR IF INPUT OR OUTPUT FILE STARTS WITH - maybe */
 				f_i_path = *++argv; /* set pointer to next argument */
 				--argc;
 				following = true; // need to add --argc
@@ -69,8 +67,6 @@ int main(int argc, char **argv)
 
 	}
 
-	//printf("d = %d\t e = %d\ti = %d\tfi = %s\to = %d\tfo  = %s\n", d, e, fi, f_i_path, fo, f_o_path);
-
 	if(e && d)
 	{
 		printf("Usage: can only be entab or detab not both!\n");
@@ -91,7 +87,6 @@ int main(int argc, char **argv)
 	if(fi)
 	{
 		char *pos = s;
-		/* TODO: read input from given file */
 		char buf[MAXSZ];
 		FILE *f = fopen(f_i_path, "r");
 		int c;
@@ -100,7 +95,6 @@ int main(int argc, char **argv)
 			*pos++ = c;
 			putchar(c);
 		}
-		//printf("%s\n", s);
 		fclose(f);
 	}
 	else
@@ -134,7 +128,6 @@ int main(int argc, char **argv)
 	/* write results to given output file if specified */
 	if(fo)
 	{
-		/* TODO: write to output file */
 		FILE *f = fopen(f_o_path, "w");
 		fputs(s, f);
 		fclose(f);
