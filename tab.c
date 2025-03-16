@@ -7,20 +7,33 @@ void copy(char *src, char *dest);
 /* detab: removes all tabs and replaces with the appropriate number of spaces. 
  * Returns the number of extra characters */
 /* TODO: IMPLEMENT MAXLEN */
-int detab(char *s, size_t maxlen, size_t tbw)
+int detab(char *s, size_t maxlen, size_t tbw, size_t tstart)
 {
 	char s_cpy[maxlen];
 	copy(s, s_cpy);
 
-	int n, p, offst;
+	int n, p, offst, newline;
 	n = offst = 0;
+	newline = 1;
 
 	while(s_cpy[n] != '\0')
 	{
 		if(s_cpy[n] == '\t')
 		{
+			int w;
 			// first tab is remainder or modulus. Subsequent tabs are just tab width.
-			int w = tbw - ((n+offst) % tbw);
+			/* if it's  a new line tabwidth is possibly effectively wider */
+			if(newline)
+			{
+
+				w = tbw * tstart - (n + offst) % tbw;
+				newline = 0;
+			}
+			else
+			{
+				w = tbw - (n + offst) % tbw;
+			}
+			/* if new line add appropriate number of extra tabs (if any specified) */
 			for(p = 0; p < w; ++p)
 			{
 				s[n+offst] = ' ';
@@ -29,8 +42,12 @@ int detab(char *s, size_t maxlen, size_t tbw)
 			--offst;
 		}
 		else
+		{
 			s[n+offst] = s_cpy[n];
+			if(s_cpy[n] == '\n')
+				newline = 1;
 
+		}
 		++n;
 	}
 	s[n+offst] = '\0';
@@ -41,7 +58,7 @@ int detab(char *s, size_t maxlen, size_t tbw)
 /* entab: This takes in a string with first position of '\t' or ' ' and rearranges it
  * and adds it to the given string, then moves pointer ahead to first non blank
  * space character. Returns removed spaces  */ //TODO: INTEGRATE MAXLEN IN
-int entab(char *s, size_t maxlen, size_t tabsz)
+int entab(char *s, size_t maxlen, size_t tabsz, size_t tstart)
 {
 	if(strlen(s) == 0)
 	{
@@ -52,8 +69,9 @@ int entab(char *s, size_t maxlen, size_t tabsz)
 	char tmp[strlen(s)+1];
 
 	/* now work with our tmp string */
-	int i, j, pos, pos_prev;
+	int i, j, pos, pos_prev, newline;
 	i = j = pos = pos_prev = 0;
+	newline = 1;
 	while(s[i] != '\0')
 	{
 		/* we need to update pos something possibly other than 1 because tab advances not one character but to next tab stop */
@@ -82,7 +100,17 @@ int entab(char *s, size_t maxlen, size_t tabsz)
 			while(s[i] == ' ' || s[i] == '\t')
 			{
 				if(s[i] == '\t')
-					pos += tabsz - pos % tabsz;
+					/* if it's a new line add appropriate number of extra spaces (if any)
+					 * to calculated ending position */
+					if(newline)
+					{
+						pos += tabsz * tstart - pos % tabsz;
+						newline = 0;
+					}
+					else
+					{
+						pos += tabsz - pos % tabsz;
+					}
 				else if(s[i] == ' ')
 					++pos;
 				else
@@ -114,6 +142,8 @@ int entab(char *s, size_t maxlen, size_t tabsz)
 		else
 		{
 			tmp[j++] = s[i];
+			if(s[i] == '\n')
+				newline = 1;
 			++pos;
 		}
 		++i;

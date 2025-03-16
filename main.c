@@ -17,10 +17,11 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	int d, e, fi, fo, tbw, following; /* following for something like a file path following */
+	int d, e, fi, fo, tbw, tstart, following; /* following for something like a file path following */
 	char *f_i_path, *f_o_path;
 	d = e = fi = fo = following = false;
 	tbw = -1;
+	tstart = 0;
 
 	/* Options: -d for detab, -e for entab, -i for reading from file, -o for writeint to a file */
 	while(--argc > 0)
@@ -61,6 +62,16 @@ int main(int argc, char **argv)
 				}
 				following = true;
 				break;
+			case 'm':
+				tstart = atoi(*++argv);
+				following = true;
+				--argc;
+				if(tstart < 0)
+				{
+					printf("Error: extra tabs at start must be >= 0\n");
+					tstart = 0;
+				}
+
 			}
 		}
 		following = false;
@@ -113,12 +124,12 @@ int main(int argc, char **argv)
 	/* entab was specified */
 	if(e)
 	{
-		ch_saved = entab(s, MAXSZ, tbw);
+		ch_saved = entab(s, MAXSZ, tbw, tstart);
 	}
 	/* detab was specified */
 	else if(d)
 	{
-		ch_saved = detab(s, MAXSZ, tbw);
+		ch_saved = detab(s, MAXSZ, tbw, tstart);
 	}
 
 	printf("\n%s", s);
