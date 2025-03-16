@@ -9,33 +9,33 @@ void copy(char *src, char *dest);
 /* TODO: IMPLEMENT MAXLEN */
 int detab(char *s, size_t maxlen, size_t tbw)
 {
-    char s_cpy[maxlen];
-    copy(s, s_cpy);
+	char s_cpy[maxlen];
+	copy(s, s_cpy);
 
-    int n, p, offst;
-    n = offst = 0;
+	int n, p, offst;
+	n = offst = 0;
 
-    while(s_cpy[n] != '\0')
-    {
-        if(s_cpy[n] == '\t')
-        {
-            // first tab is remainder or modulus. Subsequent tabs are just tab width.
-            int w = tbw - ((n+offst) % tbw);
-            for(p = 0; p < w; ++p)
-            {
-                s[n+offst] = ' ';
-                ++offst;
-            }
-            --offst;
-        }
-        else
-            s[n+offst] = s_cpy[n];
+	while(s_cpy[n] != '\0')
+	{
+		if(s_cpy[n] == '\t')
+		{
+			// first tab is remainder or modulus. Subsequent tabs are just tab width.
+			int w = tbw - ((n+offst) % tbw);
+			for(p = 0; p < w; ++p)
+			{
+				s[n+offst] = ' ';
+				++offst;
+			}
+			--offst;
+		}
+		else
+			s[n+offst] = s_cpy[n];
 
-        ++n;
-    }
-    s[n+offst] = '\0';
-    //return n+offst;
-    return offst; /* I think this will tell us the extra characters added */
+		++n;
+	}
+	s[n+offst] = '\0';
+	//return n+offst;
+	return offst; /* I think this will tell us the extra characters added */
 }
 
 /* entab: This takes in a string with first position of '\t' or ' ' and rearranges it
