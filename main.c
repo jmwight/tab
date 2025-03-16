@@ -113,12 +113,12 @@ int main(int argc, char **argv)
 	/* entab was specified */
 	if(e)
 	{
-		ch_saved = detab(s, MAXSZ, tbw);
+		ch_saved = entab(s, MAXSZ, tbw);
 	}
 	/* detab was specified */
 	else if(d)
 	{
-		ch_saved = entab(s, MAXSZ, tbw);
+		ch_saved = detab(s, MAXSZ, tbw);
 	}
 
 	printf("\n%s", s);
